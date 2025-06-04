@@ -1,5 +1,5 @@
-import {User} from "../../entities/user.entity";
-import ErrorConfig from "../../helpers/errorConfig";
+
+import ErrorConfig from "../../helpers/errorConfig.js";
 const isAuthenticated=(roles)=>{
   return async(req,_,next)=>{
     try{

@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken";
-import ErrorConfig from "../../helpers/errorConfig";
-import asyncHandler from "../../helpers/asyncHandler";
-import { User } from "../../entities/user.entity";
-import generateToken from "../../utils/generateToken";
+import ErrorConfig from "../../helpers/errorConfig.js";
+import asyncHandler from "../../helpers/asyncHandler.js";
+import generateToken from "../../utils/generateToken.js";
 
-const isLoggedIn = asyncHandler(async (req, res, next) => {
+// Middleware to check if the user is logged in
+const authenticateUser = asyncHandler(async (req, res, next) => {
   const access_token = req?.cookies?.access_token?.split(" ")[1];
   const refresh_token = req?.cookies?.refresh_token?.split(" ")[1];
   if (!access_token && !refresh_token) {
@@ -58,4 +58,4 @@ const isLoggedIn = asyncHandler(async (req, res, next) => {
   }
 });
 
-export { isLoggedIn };
+export { authenticateUser };

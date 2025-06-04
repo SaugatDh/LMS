@@ -1,16 +1,16 @@
-import asyncHandler from "../../helpers/asyncHandler";
-import ErrorConfig from "../../helpers/errorConfig";
-import ResponseConfig from "../../helpers/responseConfig";
-import generateToken from "../../utils/generateToken";
 import bcrypt from "bcryptjs";
-import generateOtp from "../../utils/generateOtp";
-import generateOtpExpirationTime from "../../utils/generateOtp";
-import uploadImageIntoCloudinary from "../../services/cloudinary.service";
 import path from "path";
 import ejs from "ejs";
-import sendEmail from "../../services/email";
-import { User } from "../../entities/user.entity";
-import hashedData from "../../utils/hashData";
+
+import asyncHandler from "../../helpers/asyncHandler.js";
+import ErrorConfig from "../../helpers/errorConfig.js";
+import ResponseConfig from "../../helpers/responseConfig.js";
+import generateToken from "../utils/generateToken.js";
+import generateOtp from "../../utils/generateOtp.js";
+import generateOtpExpirationTime from "../../utils/generateOtpExpirationTime.js";
+import uploadImageIntoCloudinary from "../../utils/uploadImageIntoCloudinary.js";
+import sendEmail from "../../utils/sendEmail.js";
+import hashedData from "../../utils/generateHash.js";
 
 const test = asyncHandler(async (req, res, next) => {
   let bool = true;

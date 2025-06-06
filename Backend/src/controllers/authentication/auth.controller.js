@@ -5,11 +5,11 @@ import ejs from "ejs";
 import asyncHandler from "../../helpers/asyncHandler.js";
 import ErrorConfig from "../../helpers/errorConfig.js";
 import ResponseConfig from "../../helpers/responseConfig.js";
-import generateToken from "../utils/generateToken.js";
+import generateToken from "../../utils/generateToken.js";
 import generateOtp from "../../utils/generateOtp.js";
 import generateOtpExpirationTime from "../../utils/generateOtpExpirationTime.js";
-import uploadImageIntoCloudinary from "../../utils/uploadImageIntoCloudinary.js";
-import sendEmail from "../../utils/sendEmail.js";
+import uploadImageIntoCloudinary from "../../services/coudinary.js";
+import sendEmail from "../../services/gmail.js";
 import hashedData from "../../utils/generateHash.js";
 
 const test = asyncHandler(async (req, res, next) => {
@@ -90,9 +90,9 @@ const userRegistration = asyncHandler(async (req, res, next) => {
       }
       await sendEmail("Verification Email", "Verification Email", userData.email, htmlTemplate);
     });
-    let access_token = await generateToken(access_token_secret, Number(access_token_expiration_time), payload);
+    let access_token = generateToken(access_token_secret, Number(access_token_expiration_time), payload);
     res.cookie("access_token", `Bearer ${access_token}`, {
-      maxAge: access_token_expiration_time,
+      maxAge: access_token_cookie_expiration_time,
       httpOnly: true,
       secure: process.env.ENVIRONMENT === "production"
     });

@@ -1,6 +1,6 @@
 import asyncHandler from "../../helpers/asyncHandler.js";
-import {hasedData} from "../../utils/generateHash.js";
-import { ResponseConfig } from "../../helpers/responseConfig.js";
+import hashedData from "../../utils/generateHash.js";
+import ResponseConfig  from "../../helpers/responseConfig.js";
 import ErrorConfig from "../../helpers/errorConfig.js";
 
 // get all users

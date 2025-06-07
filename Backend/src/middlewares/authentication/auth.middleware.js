@@ -8,7 +8,7 @@ const authenticateUser = asyncHandler(async (req, res, next) => {
   const access_token = req?.cookies?.access_token?.split(" ")[1];
   const refresh_token = req?.cookies?.refresh_token?.split(" ")[1];
   if (!access_token && !refresh_token) {
-    throw new ErrorConfig(401, "please logged in to access this service !!");
+    return res.status(401).json({status:401, message:"please logged in to access this service !"});
   }
   if (!access_token && refresh_token) {
     console.log("refresh token available & access_token unavailable");
@@ -18,7 +18,7 @@ const authenticateUser = asyncHandler(async (req, res, next) => {
     );
     if (verifyRefreshToken) {
       let findUserByToken = await User.findOne({ where: { refresh_token } });
-      if (!findUserByToken) throw new ErrorConfig(401, "unauthorized access");
+      if (!findUserByToken)  return res.status(401).json({status:401, message:"unauthorized access !"});
       let payload = { email: findUserByToken.email };
       let access_token_secret = process.env.ACCESS_TOKEN_SECRET;
       let access_token_expiration_time = Number(
@@ -27,7 +27,7 @@ const authenticateUser = asyncHandler(async (req, res, next) => {
       let access_token_cookie_expiration_time = Number(
         process.env.ACCESS_TOKEN_COOKIE_EXPIRATION_TIME
       );
-      let access_token = await generateToken(
+      let access_token = generateToken(
         access_token_secret,
         access_token_expiration_time,
         payload
@@ -40,7 +40,7 @@ const authenticateUser = asyncHandler(async (req, res, next) => {
       req.email = payload?.email;
       next();
     } else {
-      throw new ErrorConfig(401, "unauthorized access");
+      return res.status(401).json({status:401, message:"unauthorized access !"}); 
     }
   }
   if (access_token) {
@@ -53,7 +53,7 @@ const authenticateUser = asyncHandler(async (req, res, next) => {
       req.email = verifyAccessToken.email;
       next();
     } else {
-      throw new ErrorConfig(401, "unauthorized access");
+      return res.status(401).json({status:401, message:"unauthorized access !"});
     }
   }
 });

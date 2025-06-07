@@ -11,6 +11,7 @@ import generateOtpExpirationTime from "../../utils/generateOtpExpirationTime.js"
 import uploadImageIntoCloudinary from "../../services/coudinary.js";
 import sendEmail from "../../services/gmail.js";
 import hashedData from "../../utils/generateHash.js";
+import prisma from "../../lib/dbConnection.js";
 
 const test = asyncHandler(async (req, res, next) => {
   let bool = true;
@@ -28,6 +29,8 @@ const userRegistration = asyncHandler(async (req, res, next) => {
   let uploadProfile;
   let inserData;
   let profileImage = req.file;
+  //deleter role for security purpose
+  delete userData?.role;
   if (profileImage) {
     uploadProfile = await uploadImageIntoCloudinary(profileImage?.path, "authentication/profile");
     console.log({ profileImage });
@@ -38,9 +41,9 @@ const userRegistration = asyncHandler(async (req, res, next) => {
   if (userDataValues.some(value => (value === null || value === undefined || value === " "))) {
     return next(new ErrorConfig(400, "All fields are required"));
   }
-  let isUserAlreadyExist = await User.findOne({ where: { email: userData?.email } });
-  if (isUserAlreadyExist) {
-    console.log({ isUserAlreadyExist });
+  let userExist = await prisma.student.findUnique({where:{email:userData.email}});
+  if (userExist) {
+    console.log({ userExist });
     return next(new ErrorConfig(400, "user already exist"));
   }
   let refresh_token_secret = process.env.REFRESH_TOKEN_SECRET;
@@ -50,8 +53,7 @@ const userRegistration = asyncHandler(async (req, res, next) => {
   let access_token_cookie_expiration_time = Number(process.env.ACCESS_TOKEN_COOKIE_EXPIRATION_TIME);
   let refresh_token_cookie_expiration_time = Number(process.env.REFRESH_TOKEN_COOKIE_EXPIRATION_TIME);
   let payload = { email: userData?.email, password: userData?.password };
-  let refresh_token = await generateToken(refresh_token_secret, Number(refresh_token_expiration_time), payload);
-
+  let access_token = generateToken(access_token_secret, Number(access_token_expiration_time), payload);
   //generate otp
   let otp = generateOtp();
   let hashedOTP = await hashedData(otp, 10);
@@ -62,17 +64,17 @@ const userRegistration = asyncHandler(async (req, res, next) => {
   userData.password = hashedPassword;
   console.log({ otp, otpExpiresAt });
   if (req.file && uploadProfile) {
-    inserData = await User.insert({
+    inserData = await prisma.student.create({
       ...userData,
-      profile: uploadProfile.url,
-      refresh_token,
+      profile: uploadProfile.url || undefined,
+      access_token,
       otp: hashedOTP,
       otp_expires_at: otpExpiresAt
     });
   } else {
-    inserData = await User.insert({
+    inserData = await prisma.student.create({
       ...userData,
-      refresh_token,
+      access_token,
       otp: hashedOTP,
       otp_expires_at: otpExpiresAt
     });
@@ -90,7 +92,7 @@ const userRegistration = asyncHandler(async (req, res, next) => {
       }
       await sendEmail("Verification Email", "Verification Email", userData.email, htmlTemplate);
     });
-    let access_token = generateToken(access_token_secret, Number(access_token_expiration_time), payload);
+    let refresh_token = generateToken(refresh_token_secret, Number(refresh_token_expiration_time), payload);
     res.cookie("access_token", `Bearer ${access_token}`, {
       maxAge: access_token_cookie_expiration_time,
       httpOnly: true,
@@ -127,10 +129,10 @@ const login = asyncHandler(async (req, res, next) => {
     let access_token_expiration_time = Number(process.env.ACCESS_TOKEN_EXPIRATION_TIME);
     let access_token_cookie_expiration_time = Number(process.env.ACCESS_TOKEN_COOKIE_EXPIRATION_TIME);
     let payload = { email: userData.email, password: userData.password };
-    let refresh_token = await generateToken(refresh_token_secret, refresh_token_expiration_time, userData);
-    let access_token = await generateToken(access_token_secret, access_token_expiration_time, payload);
+    let refresh_token =  generateToken(refresh_token_secret, refresh_token_expiration_time, userData);
+    let access_token = generateToken(access_token_secret, access_token_expiration_time, payload);
     res.cookie("access_token", `Bearer ${access_token}`, {
-      maxAge: access_token_expiration_time,
+      maxAge: access_token_cookie_expiration_time,
       httpOnly: true,
       secure: process.env.ENVIRONMENT === "production"
     });
@@ -153,18 +155,21 @@ const loggedOut = asyncHandler(async (req, res, next) => {
 
 const verifyOtp = asyncHandler(async (req, res, next) => {
   let { email } = req.body;
-  let findUser = await User.findOne({ where: { email } });
+  let findUser = await prisma.student.findUnique({ where: { email } });
   if (!findUser) return next(new ErrorConfig(401, "unauthorized access"));
   let verifyOtpCode = await bcrypt.compare(req.params.otpCode, findUser.otp);
   if (!verifyOtpCode || !findUser.otp_expires_at) return next(new ErrorConfig(401, "Invalid code"));
   let isOtpValid = new Date() < findUser.otp_expires_at;
   console.log({ now: new Date(), otpExpires: findUser.otp_expires_at });
   if (!isOtpValid) return next(new ErrorConfig(401, "OTP expires"));
-  let verifyAccount = await User.update({ otp: req.params.otpCode }, { otp: undefined, otp_expires_at: undefined, is_verified: true });
+  let verifyAccount = await prisma.student.update({
+    where: { otp: req.params.otpCode },
+    data: { otp: undefined, otp_expires_at: undefined, is_verified: true }
+    });
   if (verifyAccount) {
     let templatePath = path.join(__dirname, "../../../views/welcomeEmailTemplate.ejs");
     let data = {
-      user: findUser.first_name //findOtp contain user data
+      user: findUser.firstName //findOtp contain user data
     };
     ejs.renderFile(templatePath, { data }, async function (err, htmlTemplate) {
       if (err) {
@@ -178,17 +183,18 @@ const verifyOtp = asyncHandler(async (req, res, next) => {
 
 const sendOtpAgain = asyncHandler(async (req, res, next) => {
   const { email } = req.body;
-  const userExist = await User.findOne({ where: { email, is_verified: false } });
+  const userExist = await prisma.student.findUnique({ where: { email, is_verified: false } });
   if (!userExist) return next(new ErrorConfig(400, "Sorry you can't use this service"));
   let otp = generateOtp();
   let hashedOTP = await hashedData(otp, 10);
   let otpExpiresAt = generateOtpExpirationTime();
   console.log({ hashedOTP, otpExpiresAt });
-  const updateOtp = await User.update(
-    { email },
-    {
+  const updateOtp = await prisma.student.update({
+      where:{email} ,
+      data:{
       otp: hashedOTP,
       otp_expires_at: otpExpiresAt
+      }
     });
   if (!updateOtp) return next(new ErrorConfig(500, "failed to update OTP"));
   console.log({ updateOtp });

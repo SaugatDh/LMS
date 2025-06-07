@@ -29,8 +29,12 @@ model User {
   lastName String
   email String @unique
   class Int?
-  role Role @default(USER)
   password String
+  profile String?
+  accessToken String
+  otp String
+  otpExpiresAt DateTime
+   role Role @default(USER)
   enrolledCourse Course[] @relation("student_relation") 
   createdCourse Course[] @relation("teacher_relation") 
   createdAt DateTime @default(now())

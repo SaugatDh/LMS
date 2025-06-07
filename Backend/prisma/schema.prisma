@@ -31,10 +31,10 @@ model User {
   class Int?
   password String
   profile String?
-  accessToken String
+  refreshToken String
   otp String
   otpExpiresAt DateTime
-   role Role @default(USER)
+  role Role @default(USER)
   enrolledCourse Course[] @relation("student_relation") 
   createdCourse Course[] @relation("teacher_relation") 
   createdAt DateTime @default(now())

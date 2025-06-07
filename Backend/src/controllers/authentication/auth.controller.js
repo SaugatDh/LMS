@@ -53,7 +53,8 @@ const userRegistration = asyncHandler(async (req, res, next) => {
   let access_token_cookie_expiration_time = Number(process.env.ACCESS_TOKEN_COOKIE_EXPIRATION_TIME);
   let refresh_token_cookie_expiration_time = Number(process.env.REFRESH_TOKEN_COOKIE_EXPIRATION_TIME);
   let payload = { email: userData?.email, password: userData?.password };
-  let access_token = generateToken(access_token_secret, Number(access_token_expiration_time), payload);
+  let refresh_token = generateToken(refresh_token_secret, Number(refresh_token_expiration_time), payload);
+ 
   //generate otp
   let otp = generateOtp();
   let hashedOTP = await hashedData(otp, 10);
@@ -67,7 +68,7 @@ const userRegistration = asyncHandler(async (req, res, next) => {
     inserData = await prisma.user.create({
       ...userData,
       profile: uploadProfile?.url || undefined,
-      accessToken:access_token,
+       refreshToken:refresh_token,
       otp: hashedOTP,
       otpExpiresAt
     });
@@ -92,7 +93,7 @@ const userRegistration = asyncHandler(async (req, res, next) => {
       }
       await sendEmail("Verification Email", "Verification Email", userData.email, htmlTemplate);
     });
-    let refresh_token = generateToken(refresh_token_secret, Number(refresh_token_expiration_time), payload);
+     let access_token = generateToken(access_token_secret, Number(access_token_expiration_time), payload);
     res.cookie("access_token", `Bearer ${access_token}`, {
       maxAge: access_token_cookie_expiration_time,
       httpOnly: true,

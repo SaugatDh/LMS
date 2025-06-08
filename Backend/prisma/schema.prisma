@@ -34,10 +34,9 @@ model User {
   refreshToken String
   otp String
   otpExpiresAt DateTime
-  isVerified Boolean @default(false)
   role Role @default(USER)
-  enrolledCourse Course[] @relation("Enrollments") 
-  createdCourse Course[] @relation("TeacherCourses") 
+  enrolledCourse Course[] @relation("student_relation") 
+  createdCourse Course[] @relation("teacher_relation") 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -49,9 +48,10 @@ model Course {
   name String
   description String
   credits Int
-  student User[] @relation("Enrollments")
-  teacherId String
-  teacher User @relation("TeacherCourses",fields: [teacherId], references: [id])
+  student_id String?
+  student User? @relation("student_relation",fields: [student_id], references: [id])
+  teacher_id String?
+  teacher User? @relation("teacher_relation",fields: [teacher_id], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

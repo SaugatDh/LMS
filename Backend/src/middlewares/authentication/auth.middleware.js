@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import asyncHandler from "../../helpers/asyncHandler.js";
 import generateToken from "../../utils/generateToken.js";
-import prisma from "../../lib/dbConnection.js";
+
 // Middleware to check if the user is logged in
 const authenticateUser = asyncHandler(async (req, res, next) => {
   const access_token = req?.cookies?.access_token?.split(" ")[1];
@@ -18,10 +18,9 @@ const authenticateUser = asyncHandler(async (req, res, next) => {
       process.env.REFRESH_TOKEN_SECRET
     );
     if (verifyRefreshToken) {
-      let findUser = await prisma.user.findUnique({ where: { refreshToken:refresh_token } });
-      if (!findUser)  return res.status(401).json({status:401, message:"unauthorized access !"});
-      payload = { id:findUser.id,email: findUser.email };
-      console.log({payload});
+      let findUserByToken = await User.findOne({ where: { refresh_token } });
+      if (!findUserByToken)  return res.status(401).json({status:401, message:"unauthorized access !"});
+      let payload = { id:findUserByToken.id,email: findUserByToken.email };
       let access_token_secret = process.env.ACCESS_TOKEN_SECRET;
       let access_token_expiration_time = process.env.ACCESS_TOKEN_EXPIRATION_TIME;
       let access_token_cookie_expiration_time = Number(
@@ -37,7 +36,7 @@ const authenticateUser = asyncHandler(async (req, res, next) => {
         httpOnly: true,
         secure: process.env.ENVIRONMENT === "production",
       });
-     req.loggedInfo = { id:findUser.id,email: findUser.email,role: findUser.role };
+     req.loggedInfo = payload;
       next();
     } else {
       return res.status(401).json({status:401, message:"unauthorized access !"}); 
@@ -50,8 +49,7 @@ const authenticateUser = asyncHandler(async (req, res, next) => {
       process.env.ACCESS_TOKEN_SECRET
     );
     if (verifyAccessToken && typeof verifyAccessToken !== "string") {
-      let findUser = await prisma.user.findUnique({ where: { refreshToken:refresh_token } });
-     req.loggedInfo = { id:findUser.id,email: findUser.email,role: findUser.role };
+      req.loggedInfo = payload;
       next();
     } else {
       return res.status(401).json({status:401, message:"unauthorized access !"});

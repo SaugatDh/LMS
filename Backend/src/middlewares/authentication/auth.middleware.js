@@ -18,10 +18,11 @@ const authenticateUser = asyncHandler(async (req, res, next) => {
       process.env.REFRESH_TOKEN_SECRET
     );
     if (verifyRefreshToken) {
-      let findUser = await prisma.user.findUnique({ where: { refreshToken:refresh_token } });
+      const verifyRefreshTokenType = jwt.verify(refresh_token, process.env.REFRESH_TOKEN_SECRET);
+      if(!verifyRefreshToken) return res.status(401).json({status:401, message:"unauthorized access !"});
+      const {email}= verifyRefreshTokenType;
+      let findUser = await prisma.user.findUnique({ where: { email } });
       if (!findUser)  return res.status(401).json({status:401, message:"unauthorized access !"});
-      payload = { id:findUser.id,email: findUser.email };
-      console.log({payload});
       let access_token_secret = process.env.ACCESS_TOKEN_SECRET;
       let access_token_expiration_time = process.env.ACCESS_TOKEN_EXPIRATION_TIME;
       let access_token_cookie_expiration_time = Number(
@@ -30,10 +31,10 @@ const authenticateUser = asyncHandler(async (req, res, next) => {
       let access_token = generateToken(
         access_token_secret,
         access_token_expiration_time,
-        payload
+        { id: findUser.id, email: findUser.email }
       );
       res.cookie("access_token", `Bearer ${access_token}`, {
-        maxAge: access_token_cookie_expiration_time,
+        maxAge: Number(access_token_cookie_expiration_time),
         httpOnly: true,
         secure: process.env.ENVIRONMENT === "production",
       });
@@ -49,8 +50,10 @@ const authenticateUser = asyncHandler(async (req, res, next) => {
       access_token,
       process.env.ACCESS_TOKEN_SECRET
     );
+    if(!verifyAccessToken) return res.status(401).json({status:401, message:"unauthorized access !"});
     if (verifyAccessToken && typeof verifyAccessToken !== "string") {
-      let findUser = await prisma.user.findUnique({ where: { refreshToken:refresh_token } });
+      const {email} = verifyAccessToken;
+      let findUser = await prisma.user.findUnique({ where: { email } });
      req.loggedInfo = { id:findUser.id,email: findUser.email,role: findUser.role };
       next();
     } else {

@@ -6,7 +6,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon ./src/index.js",
+    "seed": "prisma db seed",
     "start": "node ./src/index.js"
+  },
+  "prisma": {
+    "seed": "node ./src/seeders/admin.seeder.js"
   },
   "keywords": [],
   "author": "",

@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 // Importing necessary modules
 import authRouter from '../routes/auth.route.js';
 import userRouter from "../routes/user.route.js";
-import errorHandler from '../middlewares/errorHandler.middleware.js';
+import errorHandler from '../middlewares/errorHandler/errorHandler.middleware.js';
 
 const app = express();
 app.use(cors());

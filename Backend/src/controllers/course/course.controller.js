@@ -36,7 +36,7 @@ const updateCourse=asyncHandler(async (req,res,next)=>{
     if(!course) return next(new ErrorConfig(404,"Course not found !"));
     const updateCourse=await prisma.course.update({
         where:{id:course_id},
-        data:{...courseData}
+        data:courseData
     });
     if(updateCourse) return res.status(200).json(new ResponseConfig(200,"Course updated successfully",updateCourse));
     return next(new ErrorConfig(500,"Failed to update course !"));

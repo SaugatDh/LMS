@@ -1,16 +1,11 @@
-
-import ErrorConfig from "../../helpers/errorConfig.js";
+import prisma from "../../lib/dbConnection.js";
 const isAuthenticated=(roles)=>{
-  return async(req,res,next)=>{
-    try{
-    let userExist=await User.findOne({where:{email:req.email}});
-    if(!userExist)  return res.status(401).json({statusCode:401,message:"sorry! you are not authenticate to access this service !"});
-    const {role}=userExist;
+  return (req,res,next)=>{
+  const {role}=req.loggedInfo;
+  if(!role) return res.status(401).json({statusCode:401,message:"please login to access this service !"});
     if(roles.includes(role)) next();
      return res.status(401).json({statusCode:401,message:"sorry! you are not authenticate to access this service !"});
-  }catch(error){
-    return res.status(500).json({statusCode:500,message:"Internal server error !"})
-  }
+ 
   }
 }
 export {isAuthenticated};

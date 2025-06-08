@@ -1,4 +1,4 @@
-import prisma from "../../lib/dbConnection.js";
+
 const isAuthenticated=(roles)=>{
   return (req,res,next)=>{
   const {role}=req.loggedInfo;

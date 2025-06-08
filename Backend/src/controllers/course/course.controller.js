@@ -3,6 +3,15 @@ import ResponseConfig from "../../helpers/responseConfig.js";
 import ErrorConfig from "../../helpers/errorConfig.js";
 import prisma from "../../lib/dbConnection.js";
 
+//Fetch all courses
+
+const fetchAllCourses=asyncHandler(async (req,res,next)=>{
+    const courses=await prisma.course.findMany({});
+    if(courses.length===0) return next(new ErrorConfig(404,"No courses found !"));
+    return res.status(200).json(new ResponseConfig(200,"All courses fetched successfully",courses));
+});
+
+
 //create courses
 const createCourse=asyncHandler(async (req,res,next)=>{
     const courseData=req.body;
@@ -11,7 +20,8 @@ const createCourse=asyncHandler(async (req,res,next)=>{
     }
     const registerCourse=await prisma.course.create({
         data:{
-            ...courseData
+            ...courseData,
+            teacherId:req.loggedInfo.id //  loggedInfo contains the id of the teacher
         }
     });
     if(registerCourse) return res.status(201).json(new ResponseConfig(201,"course created successfully",registerCourse));
@@ -20,7 +30,7 @@ const createCourse=asyncHandler(async (req,res,next)=>{
 
 // remove courses
 const removeCourse=(async (req,res,next)=>{
-    const {course_id}=req.param;
+    const {course_id}=req.params;
     const course=await prisma.course.findUnique({where:{id:course_id}});
     if (!course) return next(new ErrorConfig(404, "course not found"));
     const removeCourse=await prisma.course.delete({where:{id:course_id}});
@@ -42,4 +52,4 @@ const updateCourse=asyncHandler(async (req,res,next)=>{
     return next(new ErrorConfig(500,"Failed to update course !"));
 });
 
-export {createCourse,removeCourse,updateCourse};
+export {fetchAllCourses,createCourse,removeCourse,updateCourse};

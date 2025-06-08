@@ -1,9 +1,8 @@
-const Home=()=>{
-    return(
-        <div className="home">
-            <h1>Welcome to the Home Page</h1>
-            <p>This is the main page of our application.</p>
-        </div>
-    );
-}
+const Home = ({ user }) => (
+  <div className="text-center">
+    <h1 className="text-2xl font-bold mb-4">Welcome, {user.email}!</h1>
+    <p>You are logged in as <b>{user.role}</b>.</p>
+  </div>
+);
+
 export default Home;

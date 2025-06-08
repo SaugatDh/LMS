@@ -1,7 +1,8 @@
 import express from "express";
 const router=express.Router();
+//This one is for checking if the user is logged in or not
 import { authenticateUser } from "../middlewares/authentication/auth.middleware.js";
-import { isAuthenticated } from "../middlewares/authentication/role.middleware.js";
+
 import{
   test,
   userRegistration,
@@ -11,7 +12,7 @@ import{
   sendOtpAgain
 }from "../controllers/authentication/auth.controller.js";
 import {upload_profile} from "../utils/multerConfig.js";
-router.route("/test").get(authenticateUser,isAuthenticated(["admin","moderator"]),test);
+router.route("/test").get(authenticateUser,test);
 router.route("/registration").post(upload_profile.single("profile"),userRegistration);
 router.route("/login").post(login);
 router.route("/logged-out").get(authenticateUser,loggedOut);

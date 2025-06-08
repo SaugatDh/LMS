@@ -1,11 +1,11 @@
 class ResponseConfig{
 constructor(
-    status,
+    statusCode,
     message,
-    data,
+    data=null,
     success = true
     ){
-    this.status = status;
+    this.statusCode = statusCode;
     this.message = message;
     this.data = data;
     this.success = success;

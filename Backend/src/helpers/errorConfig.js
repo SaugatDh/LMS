@@ -1,7 +1,7 @@
 class ErrorConfig extends Error{
-  constructor(status, message, success = false){
+  constructor(statusCode, message, success = false){
     super(message);
-    this.status=status;
+    this.statusCode=statusCode;
     this.success=success;
   }
 }

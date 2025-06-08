@@ -1,17 +1,21 @@
 import bcrypt from "bcryptjs";
-import path from "path";
+import path,{ dirname } from 'path';
+import { fileURLToPath } from 'url';
 import ejs from "ejs";
 
 import asyncHandler from "../../helpers/asyncHandler.js";
 import ErrorConfig from "../../helpers/errorConfig.js";
 import ResponseConfig from "../../helpers/responseConfig.js";
 import generateToken from "../../utils/generateToken.js";
-import generateOtp from "../../utils/generateOtp.js";
+import generateOtp from "../../utils/generateOTP.js";
 import generateOtpExpirationTime from "../../utils/generateOtpExpirationTime.js";
 import uploadImageIntoCloudinary from "../../services/coudinary.js";
 import sendEmail from "../../services/gmail.js";
 import hashedData from "../../utils/generateHash.js";
 import prisma from "../../lib/dbConnection.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const test = asyncHandler(async (req, res, next) => {
   let bool = true;
@@ -25,6 +29,7 @@ const test = asyncHandler(async (req, res, next) => {
 
 const userRegistration = asyncHandler(async (req, res, next) => {
   let userData = req.body;
+  console.log({userData});
   let userDataValues = Object.values(userData);
   let uploadProfile;
   let inserData;
@@ -47,13 +52,13 @@ const userRegistration = asyncHandler(async (req, res, next) => {
     return next(new ErrorConfig(400, "user already exist"));
   }
   let refresh_token_secret = process.env.REFRESH_TOKEN_SECRET;
-  let refresh_token_expiration_time = Number(process.env.REFRESH_TOKEN_EXPIRATION_TIME);
+  let refresh_token_expiration_time = process.env.REFRESH_TOKEN_EXPIRATION_TIME;
   let access_token_secret = process.env.ACCESS_TOKEN_SECRET;
-  let access_token_expiration_time = Number(process.env.ACCESS_TOKEN_EXPIRATION_TIME);
+  let access_token_expiration_time = process.env.ACCESS_TOKEN_EXPIRATION_TIME;
   let access_token_cookie_expiration_time = Number(process.env.ACCESS_TOKEN_COOKIE_EXPIRATION_TIME);
   let refresh_token_cookie_expiration_time = Number(process.env.REFRESH_TOKEN_COOKIE_EXPIRATION_TIME);
   let payload = { email: userData?.email, password: userData?.password };
-  let refresh_token = generateToken(refresh_token_secret, Number(refresh_token_expiration_time), payload);
+  let refresh_token = generateToken(refresh_token_secret, refresh_token_expiration_time, payload);
  
   //generate otp
   let otp = generateOtp();
@@ -66,22 +71,26 @@ const userRegistration = asyncHandler(async (req, res, next) => {
   console.log({ otp, otpExpiresAt });
   if (req.file && uploadProfile) {
     inserData = await prisma.user.create({
+      data:{
       ...userData,
       profile: uploadProfile?.url || undefined,
        refreshToken:refresh_token,
       otp: hashedOTP,
       otpExpiresAt
+      }
     });
   } else {
     inserData = await prisma.user.create({
+      data:{
       ...userData,
-      accessToken:access_token,
+      refreshToken:refresh_token,
       otp: hashedOTP,
       otpExpiresAt
+      }
     });
   }
   if (inserData) {
-    let templatePath = path.join(__dirname, "../../../views/verificationEmailTemplate.ejs");
+    let templatePath = path.join(__dirname, "../../views/verificationEmailTemplate.ejs");
     let data = {
       user: userData.first_name,
       otpCode: otp
@@ -93,7 +102,7 @@ const userRegistration = asyncHandler(async (req, res, next) => {
       }
       await sendEmail("Verification Email", "Verification Email", userData.email, htmlTemplate);
     });
-     let access_token = generateToken(access_token_secret, Number(access_token_expiration_time), payload);
+     let access_token = generateToken(access_token_secret, access_token_expiration_time, payload);
     res.cookie("access_token", `Bearer ${access_token}`, {
       maxAge: access_token_cookie_expiration_time,
       httpOnly: true,
@@ -117,17 +126,17 @@ const login = asyncHandler(async (req, res, next) => {
     return next(new ErrorConfig(400, "All fields are required"));
   }
   let { email, password } = userData;
-  let verifyEmail = await User.findOne({ where: { email } });
+  let verifyEmail = await prisma.user.findUnique({ where: { email } });
   if (verifyEmail?.is_verified === false) return next(new ErrorConfig(400, "please verify your account"));
   if (!verifyEmail) return next(new ErrorConfig(400, "Email or password doesn't match !!"));
   if (verifyEmail) {
     let verifyPassword = await bcrypt.compare(password, verifyEmail.password);
     if (!verifyPassword) return next(new ErrorConfig(400, "Email or password doesn't match !!"));
     let refresh_token_secret = process.env.REFRESH_TOKEN_SECRET;
-    let refresh_token_expiration_time = Number(process.env.REFRESH_TOKEN_EXPIRATION_TIME);
+    let refresh_token_expiration_time = process.env.REFRESH_TOKEN_EXPIRATION_TIME;
     let refresh_token_cookie_expiration_time = Number(process.env.REFRESH_TOKEN_COOKIE_EXPIRATION_TIME);
     let access_token_secret = process.env.ACCESS_TOKEN_SECRET;
-    let access_token_expiration_time = Number(process.env.ACCESS_TOKEN_EXPIRATION_TIME);
+    let access_token_expiration_time = process.env.ACCESS_TOKEN_EXPIRATION_TIME;
     let access_token_cookie_expiration_time = Number(process.env.ACCESS_TOKEN_COOKIE_EXPIRATION_TIME);
     let payload = { email: userData.email, password: userData.password };
     let refresh_token =  generateToken(refresh_token_secret, refresh_token_expiration_time, userData);
@@ -142,7 +151,7 @@ const login = asyncHandler(async (req, res, next) => {
       secure: process.env.ENVIRONMENT === "production",
       httpOnly: true
     });
-    return res.status(201).json(new ResponseConfig(201, "Welcome,logged in successfully."));
+    return res.status(200).json(new ResponseConfig(200, "Welcome,logged in successfully."));
   }
   next(new ErrorConfig(400, "Failed to logged in!!"));
 });

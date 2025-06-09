@@ -127,7 +127,8 @@ const login = asyncHandler(async (req, res, next) => {
   }
   let { email, password } = userData;
   let verifyEmail = await prisma.user.findUnique({ where: { email } });
-  if (verifyEmail?.is_verified === false) return next(new ErrorConfig(400, "please verify your account"));
+  console.log({verifyEmail})
+  if (verifyEmail?.isVerified === false) return next(new ErrorConfig(400, "please verify your account"));
   if (!verifyEmail) return next(new ErrorConfig(400, "Email or password doesn't match !!"));
   if (verifyEmail) {
     let verifyPassword = await bcrypt.compare(password, verifyEmail.password);

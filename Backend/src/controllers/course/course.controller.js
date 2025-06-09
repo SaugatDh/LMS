@@ -11,11 +11,30 @@ const fetchAllCourses=asyncHandler(async (req,res,next)=>{
     return res.status(200).json(new ResponseConfig(200,"All courses fetched successfully",courses));
 });
 
+// fetch all of the courses by teacher
+const fetchCoursesByTeacher=asyncHandler(async (req,res,next)=>{
+    const {id}=req.loggedInfo; // loggedInfo contains the id of the teacher
+    const courses=await prisma.course.findMany({where:{teacherId:id}});
+    if(courses.length===0) return res.status(404).json(new ResponseConfig(404,"No courses found for this teacher !",[]));
+    return res.status(200).json(new ResponseConfig(200,"Courses fetched successfully",courses));
+});
+
+// fetch all courses in which the user is enrolled
+const fetchEnrolledCourses=asyncHandler(async (req,res,next)=>{ 
+    const {id}=req.loggedInfo; // loggedInfo contains the id of the user
+    const enrolledCourses=await prisma.enrollment.findMany({
+        where:{userId:id},
+        include:{course:true} // include course details
+    });
+    if(enrolledCourses.length===0) return res.status(404).json(new ResponseConfig(404,"No enrolled courses found !",[]));
+    return res.status(200).json(new ResponseConfig(200,"Enrolled courses fetched successfully",enrolledCourses));
+});
 
 //create courses
 const createCourse=asyncHandler(async (req,res,next)=>{
     const courseData=req.body;
-    if(courseData.values.some(data=>(data===" " || data===undefined || data===null))){
+    console.log({courseData})
+    if(Object.values(courseData).some(data=>(data===" " || data===undefined || data===null))){
             return next(new ErrorConfig(400,"All fields are required !"));
     }
     const registerCourse=await prisma.course.create({

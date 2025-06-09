@@ -3,6 +3,31 @@ import ResponseConfig from "../../helpers/responseConfig.js";
 import ErrorConfig from "../../helpers/errorConfig.js";
 import prisma from "../../lib/dbConnection.js";
 
+//Enroll a user in a course
+const enrollInCourse=asyncHandler(async (req,res,next)=>{
+    const {courseId}=req.params;
+    const {id}=req.loggedInfo; // loggedInfo contains the id of the user
+    // Check if the course exists
+    const course=await prisma.course.findUnique({where:{id:courseId}});
+    if(!course) return next(new ErrorConfig(404,"Course not found !"));
+    // Check if the user is already enrolled in the course
+    const existingEnrollment=await prisma.enrollment.findUnique({
+        where:{
+                userId:id,
+                courseId:courseId
+        }
+    });
+    if(existingEnrollment) return next(new ErrorConfig(409,"User is already enrolled in this course !"));
+    const enrollment=await prisma.enrollment.create({
+        data:{
+            userId:id,
+            courseId:courseId
+        }
+    });
+    if(enrollment) return res.status(201).json(new ResponseConfig(201,"Enrolled in course successfully",enrollment));
+    return next(new ErrorConfig(500,"Failed to enroll in course !"));
+});
+
 //Fetch all courses
 
 const fetchAllCourses=asyncHandler(async (req,res,next)=>{
@@ -14,7 +39,7 @@ const fetchAllCourses=asyncHandler(async (req,res,next)=>{
 // fetch all of the courses by teacher
 const fetchCoursesByTeacher=asyncHandler(async (req,res,next)=>{
     const {id}=req.loggedInfo; // loggedInfo contains the id of the teacher
-    const courses=await prisma.course.findMany({where:{teacherId:id}});
+    const courses=await prisma.course.findMany({where:{teacherId:id},include:{teacher:true,enrollments:true}});
     if(courses.length===0) return res.status(404).json(new ResponseConfig(404,"No courses found for this teacher !",[]));
     return res.status(200).json(new ResponseConfig(200,"Courses fetched successfully",courses));
 });
@@ -24,7 +49,7 @@ const fetchEnrolledCourses=asyncHandler(async (req,res,next)=>{
     const {id}=req.loggedInfo; // loggedInfo contains the id of the user
     const enrolledCourses=await prisma.enrollment.findMany({
         where:{userId:id},
-        include:{course:true} // include course details
+        include:{course:true,} // include course details
     });
     if(enrolledCourses.length===0) return res.status(404).json(new ResponseConfig(404,"No enrolled courses found !",[]));
     return res.status(200).json(new ResponseConfig(200,"Enrolled courses fetched successfully",enrolledCourses));
@@ -33,7 +58,7 @@ const fetchEnrolledCourses=asyncHandler(async (req,res,next)=>{
 //create courses
 const createCourse=asyncHandler(async (req,res,next)=>{
     const courseData=req.body;
-    console.log({courseData})
+    console.log({courseData});
     if(Object.values(courseData).some(data=>(data===" " || data===undefined || data===null))){
             return next(new ErrorConfig(400,"All fields are required !"));
     }
@@ -71,4 +96,4 @@ const updateCourse=asyncHandler(async (req,res,next)=>{
     return next(new ErrorConfig(500,"Failed to update course !"));
 });
 
-export {fetchAllCourses,createCourse,removeCourse,updateCourse};
+export {enrollInCourse,fetchAllCourses,fetchCoursesByTeacher,fetchEnrolledCourses,createCourse,removeCourse,updateCourse};

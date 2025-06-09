@@ -1,42 +1,107 @@
 import React, { useState } from "react";
-import { FaBars, FaCog, FaUserCircle, FaHome, FaBook } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
-const Sidebar = ({ open, onClose }) => (
-  <div
-    className={`fixed top-0 left-0 h-full w-64 bg-white text-gray-800 transform ${
-      open ? "translate-x-0" : "-translate-x-full"
-    } transition-transform duration-300 z-40 shadow`}
-  >
-    <div className="flex items-center justify-between p-4 border-b border-gray-200">
-      <span className="text-xl font-bold flex items-center">
-        <FaBook className="mr-2" /> LMS
-      </span>
-      <button onClick={onClose} className="text-2xl text-gray-600 hover:text-gray-900">
-        &times;
-      </button>
+// Dashboard content as a component
+const courses = [
+  {
+    id: 1,
+    title: "React for Beginners",
+    progress: 60,
+    nextLesson: "Handling Events",
+  },
+  {
+    id: 2,
+    title: "Intro to Python",
+    progress: 80,
+    nextLesson: "Functions and Loops",
+  },
+];
+
+// Example available courses (replace or expand as needed)
+const availableCourses = [
+  {
+    id: 101,
+    title: "Advanced JavaScript",
+    description: "Deep dive into JS concepts and best practices.",
+  },
+  {
+    id: 102,
+    title: "Data Structures in Python",
+    description: "Learn about lists, trees, graphs, and more.",
+  },
+  {
+    id: 103,
+    title: "UI/UX Design Basics",
+    description: "Principles of user interface and experience design.",
+  },
+  {
+    id: 104,
+    title: "Machine Learning 101",
+    description: "Introduction to ML concepts and algorithms.",
+  },
+];
+
+function StudentDashboard({ studentName }) {
+  return (
+    <div className="max-w-7xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6">
+        Welcome back, {studentName} 👋
+      </h1>
+      <h2 className="text-xl font-semibold mb-4">Your Courses</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {courses.map((course) => (
+          <div key={course.id} className="bg-white rounded-2xl shadow p-4">
+            <h3 className="text-lg font-semibold">{course.title}</h3>
+            <p className="text-sm text-gray-600">
+              Next: {course.nextLesson}
+            </p>
+            <div className="mt-3">
+              <div className="w-full bg-gray-200 h-2 rounded-full">
+                <div
+                  className="bg-blue-500 h-2 rounded-full"
+                  style={{ width: `${course.progress}%` }}
+                />
+              </div>
+              <p className="text-sm text-right mt-1 text-gray-500">
+                {course.progress}% completed
+              </p>
+            </div>
+            <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition">
+              Continue
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
-    <nav className="mt-6 flex flex-col gap-4 px-4">
-      <a href="#" className="flex items-center gap-2 py-2 rounded hover:bg-gray-100 hover:text-gray-900 transition">
-        <FaHome /> Home
-      </a>
-      {/* Add more sidebar links here */}
-    </nav>
+  );
+}
+
+const AvailableCoursesSection = () => (
+  <div className="max-w-7xl mx-auto mt-16">
+    <div className="flex items-center justify-between mb-6">
+      <h2 className="text-2xl font-bold">Explore More Courses</h2>
+      <Link
+        to="/courses"
+        className="text-blue-600 hover:underline font-medium text-base"
+      >
+        Browse All &rarr;
+      </Link>
+    </div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {availableCourses.slice(0, 3).map((course) => (
+        <div key={course.id} className="bg-white rounded-2xl shadow p-6 flex flex-col">
+          <h3 className="text-lg font-semibold mb-2">{course.title}</h3>
+          <p className="text-gray-600 flex-1">{course.description}</p>
+          <button className="mt-4 bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition">
+            Enroll
+          </button>
+        </div>
+      ))}
+    </div>
   </div>
-);
-
-const Navbar = ({ onMenuClick, user }) => (
-  <nav className="flex items-center justify-between bg-white shadow px-4 py-3 fixed w-full z-30">
-    <div className="flex items-center gap-2">
-      <button onClick={onMenuClick} className="text-2xl text-gray-700 mr-2">
-        <FaBars />
-      </button>
-      <span className="font-bold text-lg text-gray-800">Dashboard</span>
-    </div>
-    <div className="flex items-center gap-4">
-      <FaCog className="text-xl text-gray-600 cursor-pointer" title="Settings" />
-      <FaUserCircle className="text-2xl text-gray-600 cursor-pointer" title={user.email} />
-    </div>
-  </nav>
 );
 
 const Home = ({ user }) => {
@@ -44,24 +109,19 @@ const Home = ({ user }) => {
 
   return (
     <div>
-      <Navbar onMenuClick={() => setSidebarOpen(true)} user={user} />
-      {/* Sidebar should have higher z-index */}
+      <Header onMenuClick={() => setSidebarOpen(true)} user={user} />
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      {/* Overlay should have lower z-index than sidebar */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-transparent  z-30"
+          className="fixed inset-0 bg-transparent z-30"
           onClick={() => setSidebarOpen(false)}
         />
       )}
-      <div className="pt-20 pl-0 md:pl-0">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Welcome, {user.email}!</h1>
-          <p>
-            You are logged in as <b>{user.role}</b>.
-          </p>
-        </div>
+      <div className="pt-20 pl-0 md:pl-0 min-h-screen bg-gray-100">
+        <StudentDashboard studentName={user?.email || "Student"} />
+        <AvailableCoursesSection />
       </div>
+      <Footer />
     </div>
   );
 };

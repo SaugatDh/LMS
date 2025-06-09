@@ -6,28 +6,22 @@ import SignupForm from "./components/SignupForm";
 import ForgotPasswordForm from "./components/ForgotPasswordForm";
 import OtpForm from "./components/OtpForm";
 import Home from "./pages/Home";
-import ProtectedRoute from "./components/ProtectedRoute";
-import { useSelector } from "react-redux";
 
 const App = () => {
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const [user, setUser] = useState(null);
 
   return (
     <Routes>
-      <Route
-        path="/"
-        element={
-          isAuthenticated ? <Navigate to="/pages/Home" /> : <Navigate to="/login" />
-        }
-      />
-      <Route path="/login" element={<LoginForm />} />
+      {/* Simple redirect from root to Home */}
+      <Route path="/" element={<Navigate to="/pages/Home" />} />
+
+      <Route path="/login" element={<LoginForm onLogin={setUser} />} />
       <Route path="/signup" element={<SignupForm />} />
       <Route path="/forgot-password" element={<ForgotPasswordForm />} />
       <Route path="/otp" element={<OtpForm />} />
 
-      <Route element={<ProtectedRoute />}>
-        <Route path="/pages/Home" element={<Home />} />
-      </Route>
+      {/* Home route without protection */}
+      <Route path="/pages/Home" element={<Home user={user || { email: "Guest", role: "Guest" }} />} />
     </Routes>
   );
 };

@@ -1,8 +1,12 @@
 // src/components/LoginForm.jsx
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { login } from "../slices/auth.slice";
+
+const SAMPLE_USER = {
+  email: "admin",
+  password: "admin",
+  role: "student",
+};
 
 const LoginForm = ({ onLogin }) => {
   const [email, setEmail] = useState("");
@@ -10,51 +14,20 @@ const LoginForm = ({ onLogin }) => {
   const [role, setRole] = useState("student");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
-  // Define custom username and password for testing
-  const CUSTOM_EMAIL = "admin";
-  const CUSTOM_PASSWORD = "admin";
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setError("");
-
-    // Temporarily bypass API call and use custom credentials
-    if (email === CUSTOM_EMAIL && password === CUSTOM_PASSWORD) {
-      dispatch(login());
-      navigate("/pages/Home");
+    if (
+      email === SAMPLE_USER.email &&
+      password === SAMPLE_USER.password &&
+      role === SAMPLE_USER.role
+    ) {
+      onLogin({ email, role });
+      navigate("/pages/Home"); // <-- update this line
     } else {
-      setError("Invalid email or password.");
+      // Update the error message to reflect the actual SAMPLE_USER credentials
+      setError(`Invalid credentials. Try ${SAMPLE_USER.email} / ${SAMPLE_USER.password} / ${SAMPLE_USER.role}`);
     }
-
-    // Original API call code (commented out for now)
-    /*
-    try {
-      const response = await fetch('/api/v1/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        dispatch(login());
-        // dispatch(login({ email: data.user.email, role: data.user.role }));
-        // onLogin({ email, role: data.user.role });
-
-        navigate("/pages/Home");
-      } else {
-        setError(data.message || "Login failed");
-      }
-    } catch (err) {
-      console.error("Login API error:", err);
-      setError("An error occurred during login.");
-    }
-    */
   };
 
   return (
@@ -62,7 +35,6 @@ const LoginForm = ({ onLogin }) => {
       <div className="w-full max-w-sm p-6 bg-white rounded shadow-md">
     <form onSubmit={handleSubmit} className="space-y-4">
       <h1 className="text-2xl font-bold text-center">🔐 MyApp Login</h1>
-      {/* You might remove the role select if the backend determines the role */}
       <select
         className="w-full border p-2 rounded"
         value={role}

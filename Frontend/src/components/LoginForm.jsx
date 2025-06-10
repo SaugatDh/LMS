@@ -23,7 +23,7 @@ const LoginForm = ({ onLogin }) => {
       role === SAMPLE_USER.role
     ) {
       onLogin({ email, role });
-      navigate("/pages/Home"); // <-- update this line
+      navigate("/Home"); // <-- update this line
     } else {
       // Update the error message to reflect the actual SAMPLE_USER credentials
       setError(`Invalid credentials. Try ${SAMPLE_USER.email} / ${SAMPLE_USER.password} / ${SAMPLE_USER.role}`);

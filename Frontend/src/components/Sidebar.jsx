@@ -1,4 +1,5 @@
-import { FaHome, FaBook } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import { FaHome, FaBook, FaGraduationCap, FaUserCircle, FaCog, FaChartLine } from "react-icons/fa";
 
 const Sidebar = ({ open, onClose }) => (
   <div
@@ -14,11 +15,53 @@ const Sidebar = ({ open, onClose }) => (
         &times;
       </button>
     </div>
-    <nav className="mt-6 flex flex-col gap-4 px-4">
-      <a href="#" className="flex items-center gap-2 py-2 rounded hover:bg-gray-100 hover:text-gray-900 transition">
-        <FaHome /> Home
-      </a>
-      {/* Add more sidebar links here */}
+    <nav className="mt-6 flex flex-col gap-2 px-4">
+      <Link 
+        to="/Home" 
+        className="flex items-center gap-2 py-3 px-4 rounded-lg hover:bg-gray-100 hover:text-blue-600 transition"
+        onClick={onClose}
+      >
+        <FaHome className="text-lg" /> 
+        <span>Home</span>
+      </Link>
+
+      <Link 
+        to="/courses" 
+        className="flex items-center gap-2 py-3 px-4 rounded-lg hover:bg-gray-100 hover:text-blue-600 transition"
+        onClick={onClose}
+      >
+        <FaGraduationCap className="text-lg" /> 
+        <span>Courses</span>
+      </Link>
+
+      <Link 
+        to="/student/dashboard" 
+        className="flex items-center gap-2 py-3 px-4 rounded-lg hover:bg-gray-100 hover:text-blue-600 transition"
+        onClick={onClose}
+      >
+        <FaChartLine className="text-lg" /> 
+        <span>Dashboard</span>
+      </Link>
+
+      <div className="border-t border-gray-200 my-4"></div>
+
+      <Link 
+        to="/profile" 
+        className="flex items-center gap-2 py-3 px-4 rounded-lg hover:bg-gray-100 hover:text-blue-600 transition"
+        onClick={onClose}
+      >
+        <FaUserCircle className="text-lg" /> 
+        <span>Profile</span>
+      </Link>
+
+      <Link 
+        to="/settings" 
+        className="flex items-center gap-2 py-3 px-4 rounded-lg hover:bg-gray-100 hover:text-blue-600 transition"
+        onClick={onClose}
+      >
+        <FaCog className="text-lg" /> 
+        <span>Settings</span>
+      </Link>
     </nav>
   </div>
 );

@@ -77,7 +77,7 @@ const userRegistration = asyncHandler(async (req, res, next) => {
     inserData = await prisma.user.create({
       data:{
       ...userData,
-      profile: uploadProfile?.url || undefined,
+      profile: uploadProfile?.url || null,
        refreshToken:refresh_token,
       otp: hashedOTP,
       otpExpiresAt

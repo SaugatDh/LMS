@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import CourseCard from "./CourseCard";
 
 const AvailableCoursesSection = ({ availableCourses }) => {
   const [enrolling, setEnrolling] = useState(null);
@@ -28,22 +29,18 @@ const AvailableCoursesSection = ({ availableCourses }) => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {availableCourses.slice(0, 3).map((course) => (
-          <div
+          <CourseCard
             key={course.id}
-            className="bg-white rounded-2xl shadow p-6 flex flex-col"
-          >
-            <h3 className="text-lg font-semibold mb-2">{course.title}</h3>
-            <p className="text-gray-600 flex-1">{course.description}</p>
-            <button
-              className={`mt-4 px-4 py-2 rounded-xl transition-all duration-300 ${
-                enrolling === course.id
-                  ? "bg-green-500 text-white"
-                  : "bg-green-600 text-white hover:bg-green-700"
-              }`}
-              onClick={() => handleEnroll(course.id)}
-              disabled={enrolling === course.id}
-            >
-              {enrolling === course.id ? (
+            title={course.title}
+            description={course.description}
+            img={
+              course.img ||
+              `https://source.unsplash.com/400x200/?learning,${encodeURIComponent(
+                course.title
+              )}`
+            }
+            button={
+              enrolling === course.id ? (
                 <span className="flex items-center justify-center">
                   <svg
                     className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
@@ -69,9 +66,12 @@ const AvailableCoursesSection = ({ availableCourses }) => {
                 </span>
               ) : (
                 "Enroll"
-              )}
-            </button>
-          </div>
+              )
+            }
+            onClick={() => handleEnroll(course.id)}
+            cardClassName="border-green-200 hover:border-green-400 hover:shadow-green-200"
+            buttonClassName="bg-green-600 hover:bg-green-700"
+          />
         ))}
       </div>
     </div>

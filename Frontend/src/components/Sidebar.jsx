@@ -3,22 +3,22 @@ import { FaHome, FaBook, FaGraduationCap, FaUserCircle, FaCog, FaChartLine } fro
 
 const Sidebar = ({ open, onClose }) => (
   <div
-    className={`fixed top-0 left-0 h-full w-64 bg-white text-gray-800 transform ${
+    className={`fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 transform ${
       open ? "translate-x-0" : "-translate-x-full"
-    } transition-transform duration-300 z-40 shadow`}
+    } transition-transform duration-300 z-40 shadow-lg border-r border-gray-200 dark:border-gray-800`}
   >
-    <div className="flex items-center justify-between p-4 border-b border-gray-200">
-      <span className="text-xl font-bold flex items-center">
+    <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-900 bg-white dark:bg-gray-900">
+      <span className="text-xl font-bold flex items-center text-blue-600 dark:text-blue-400">
         <FaBook className="mr-2" /> LMS
       </span>
-      <button onClick={onClose} className="text-2xl text-gray-600 hover:text-gray-900">
+      <button onClick={onClose} className="text-2xl text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
         &times;
       </button>
     </div>
     <nav className="mt-6 flex flex-col gap-2 px-4">
       <Link 
         to="/Home" 
-        className="flex items-center gap-2 py-3 px-4 rounded-lg hover:bg-gray-100 hover:text-blue-600 transition"
+        className="flex items-center gap-2 py-3 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
         onClick={onClose}
       >
         <FaHome className="text-lg" /> 
@@ -27,7 +27,7 @@ const Sidebar = ({ open, onClose }) => (
 
       <Link 
         to="/courses" 
-        className="flex items-center gap-2 py-3 px-4 rounded-lg hover:bg-gray-100 hover:text-blue-600 transition"
+        className="flex items-center gap-2 py-3 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
         onClick={onClose}
       >
         <FaGraduationCap className="text-lg" /> 
@@ -36,18 +36,18 @@ const Sidebar = ({ open, onClose }) => (
 
       <Link 
         to="/student/dashboard" 
-        className="flex items-center gap-2 py-3 px-4 rounded-lg hover:bg-gray-100 hover:text-blue-600 transition"
+        className="flex items-center gap-2 py-3 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
         onClick={onClose}
       >
         <FaChartLine className="text-lg" /> 
         <span>Dashboard</span>
       </Link>
 
-      <div className="border-t border-gray-200 my-4"></div>
+      <div className="border-t border-gray-200 dark:border-gray-200 my-4"></div>
 
       <Link 
         to="/profile" 
-        className="flex items-center gap-2 py-3 px-4 rounded-lg hover:bg-gray-100 hover:text-blue-600 transition"
+        className="flex items-center gap-2 py-3 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
         onClick={onClose}
       >
         <FaUserCircle className="text-lg" /> 
@@ -56,7 +56,7 @@ const Sidebar = ({ open, onClose }) => (
 
       <Link 
         to="/settings" 
-        className="flex items-center gap-2 py-3 px-4 rounded-lg hover:bg-gray-100 hover:text-blue-600 transition"
+        className="flex items-center gap-2 py-3 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
         onClick={onClose}
       >
         <FaCog className="text-lg" /> 

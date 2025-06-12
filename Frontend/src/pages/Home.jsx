@@ -11,10 +11,18 @@ const courses = [
 ];
 
 const availableCourses = [
-	{ id: 101, title: "Advanced JavaScript", description: "Deep dive into JS concepts and best practices." },
-	{ id: 102, title: "Data Structures in Python", description: "Learn about lists, trees, graphs, and more." },
-	{ id: 103, title: "UI/UX Design Basics", description: "Principles of user interface and experience design." },
-	{ id: 104, title: "Machine Learning 101", description: "Introduction to ML concepts and algorithms." },
+	{ id: 101, title: "Advanced JavaScript", description: "Deep dive into JS concepts and best practices.", category: "Programming", img: "https://source.unsplash.com/400x200/?javascript,code" },
+	{ id: 102, title: "Data Structures in Python", description: "Learn about lists, trees, graphs, and more.", category: "Programming", img: "https://source.unsplash.com/400x200/?python,data-structures" },
+	{ id: 103, title: "UI/UX Design Basics", description: "Principles of user interface and experience design.", category: "Design", img: "https://source.unsplash.com/400x200/?ui,ux,design" },
+	{ id: 104, title: "Machine Learning 101", description: "Introduction to ML concepts and algorithms.", category: "AI & ML", img: "https://source.unsplash.com/400x200/?machine-learning,ai" },
+	{ id: 105, title: "Web Development Bootcamp", description: "HTML, CSS, JS, and modern frameworks.", category: "Programming", img: "https://source.unsplash.com/400x200/?web-development,html,css" },
+	{ id: 106, title: "Digital Marketing Essentials", description: "SEO, SEM, and social media marketing.", category: "Marketing", img: "https://source.unsplash.com/400x200/?marketing,digital" },
+	{ id: 107, title: "Cloud Computing Basics", description: "AWS, Azure, and cloud fundamentals.", category: "Cloud", img: "https://source.unsplash.com/400x200/?cloud,aws,azure" },
+	{ id: 108, title: "Cybersecurity Fundamentals", description: "Protect systems and data from threats.", category: "Security", img: "https://source.unsplash.com/400x200/?cybersecurity,security" },
+	{ id: 109, title: "Project Management", description: "Agile, Scrum, and project planning.", category: "Business", img: "https://source.unsplash.com/400x200/?project-management,agile" },
+	{ id: 110, title: "Photography Masterclass", description: "Camera basics, lighting, and editing.", category: "Creative", img: "https://source.unsplash.com/400x200/?photography,camera" },
+	{ id: 111, title: "Financial Literacy", description: "Personal finance, investing, and budgeting.", category: "Finance", img: "https://source.unsplash.com/400x200/?finance,money" },
+	{ id: 112, title: "Mobile App Development", description: "Build apps for Android and iOS.", category: "Programming", img: "https://source.unsplash.com/400x200/?mobile,app-development" },
 ];
 
 const Home = ({ user }) => {
@@ -30,14 +38,17 @@ const Home = ({ user }) => {
 					onClick={() => setSidebarOpen(false)}
 				/>
 			)}
-			{/* Increased top padding to account for double-height header */}
-			<div className="pt-35 px-4 min-h-screen bg-gray-100"> 
+			<div className="pt-32 px-4 min-h-screen bg-gray-50">
 				<div className="max-w-7xl mx-auto">
-					<EnrolledCourses
-						studentName={user?.email || "Student"}
-						courses={courses}
-					/>
-					<div className="mt-8"> {/* Added margin-top for separation */}
+					{/* Minimal Welcome Banner */}
+					<div className="bg-white rounded-lg border p-6 mb-8">
+						<h1 className="text-2xl font-semibold text-gray-800">Welcome back, {user?.email || "Student"}</h1>
+						<p className="text-gray-500 mt-1 text-base">Explore your courses and find new ones to learn.</p>
+					</div>
+
+					<EnrolledCourses courses={courses} />
+
+					<div className="mt-10 mb-10">
 						<AvailableCoursesSection availableCourses={availableCourses} />
 					</div>
 				</div>

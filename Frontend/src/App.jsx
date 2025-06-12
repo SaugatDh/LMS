@@ -16,12 +16,13 @@ const App = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/Home" />} />
+      <Route path="/" element={<Navigate to="/home" />} />
       <Route path="/login" element={<LoginForm onLogin={setUser} />} />
       <Route path="/signup" element={<SignupForm />} />
       <Route path="/forgot-password" element={<ForgotPasswordForm />} />
       <Route path="/otp" element={<OtpForm />} />
       <Route path="/home" element={<Home user={user || { email: "Guest", role: "Guest" }} />} />
+      <Route path="/Home" element={<Home user={user || { email: "Guest", role: "Guest" }} />} />
       <Route path="/courses" element={<Courses user={user || { email: "Guest", role: "Guest" }}  />} /> 
       <Route path="/course/:courseId" element={<CourseDetail user={user || { email: "Guest", role: "Guest" }} />} />
       <Route 

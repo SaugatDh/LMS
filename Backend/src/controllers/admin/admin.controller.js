@@ -3,35 +3,36 @@ import ResponseConfig from "../../helpers/responseConfig.js";
 import ErrorConfig from "../../helpers/errorConfig.js";
 import prisma from "../../lib/dbConnection.js";
 
-// update user role 
+// update user role or depending upon condition admin may update others fields as well
 const updateRole = asyncHandler(async (req, res, next) => {
-  const { email } = req;
+  const { user_id } = req.params;
   const { role } = req.body;
-  const findUser = await prisma.student.findUnique({ where: { email } });
+  const findUser = await prisma.user.findUnique({ where: { id: user_id } });
   if (!findUser) return next(new ErrorConfig(404, "user not found"));
-  const updateUserRole = await prisma.student.update({
-    where: email,
+  const updateUserRole = await prisma.user.update({
+    where: { id: user_id },
     data: {
       role,
+      otp:null,
+      otpExpiresAt: null,
+      isVerified: req.body?.isVerified || false,
     },
   });
   if (updateUserRole)
     return res
       .status(200)
       .json(
-        new ResponseConfig(200, "role updated successfully", {
-          role: updateUserRole.role,
-        })
+        new ResponseConfig(200, "role updated successfully",{user:updateUserRole})
       );
       return next(new ErrorConfig(500,"failed to update role !"));
 });
 
 //delete user from database
 const removeUser=asyncHandler(async (req,res,next)=>{
-  const { email } = req;
-  const findUser = await prisma.student.findUnique({ where: { email } });
+  const { user_id } = req.params;
+  const findUser = await prisma.user.findUnique({ where: { id: user_id } });
   if (!findUser) return next(new ErrorConfig(404, "user not found"));
-  const deleteUser=await prisma.student.delete({where:{email}});
+  const deleteUser=await prisma.user.delete({where:{id: user_id}});
   if(deleteUser) return res.status(200).json(new ResponseConfig(200,"user deleted successfully"));
   return next(new ErrorConfig(500,"failed to delete user !"));
 });

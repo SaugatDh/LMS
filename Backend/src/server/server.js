@@ -5,7 +5,9 @@ import cookieParser from 'cookie-parser';
 // Importing necessary modules
 import authRouter from '../routes/auth.route.js';
 import userRouter from "../routes/user.route.js";
-import errorHandler from '../middlewares/errorHandler.middleware.js';
+import courseRouter from "../routes/course.route.js";
+import errorHandler from '../middlewares/errorHandler/errorHandler.middleware.js';
+import adminRouter from '../routes/admin.route.js';
 
 const app = express();
 app.use(cors());
@@ -15,5 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use('/api/v1/auth', authRouter);
 app.use("/api/v1/user",userRouter);
+app.use("/api/v1/course",courseRouter);
+app.use("/api/v1/admin",adminRouter);
 app.use(errorHandler);
 export default app;

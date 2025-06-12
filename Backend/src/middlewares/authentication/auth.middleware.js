@@ -6,55 +6,49 @@ import generateToken from "../../utils/generateToken.js";
 const authenticateUser = asyncHandler(async (req, res, next) => {
   const access_token = req?.cookies?.access_token?.split(" ")[1];
   const refresh_token = req?.cookies?.refresh_token?.split(" ")[1];
-  console.log({access_token,refresh_token});
-  console.log({cookies:req.cookies})
-  if (!access_token && !refresh_token) {
-    return res.status(401).json({status:401, message:"please logged in to access this service !"});
-  }
-  if (!access_token && refresh_token) {
-    console.log("refresh token available & access_token unavailable");
-    let verifyRefreshToken = jwt.verify(
-      refresh_token,
-      process.env.REFRESH_TOKEN_SECRET
-    );
-    if (verifyRefreshToken) {
-      let findUserByToken = await User.findOne({ where: { refresh_token } });
-      if (!findUserByToken)  return res.status(401).json({status:401, message:"unauthorized access !"});
-      let payload = { id:findUserByToken.id,email: findUserByToken.email };
-      let access_token_secret = process.env.ACCESS_TOKEN_SECRET;
-      let access_token_expiration_time = process.env.ACCESS_TOKEN_EXPIRATION_TIME;
-      let access_token_cookie_expiration_time = Number(
-        process.env.ACCESS_TOKEN_COOKIE_EXPIRATION_TIME
-      );
-      let access_token = generateToken(
-        access_token_secret,
-        access_token_expiration_time,
-        payload
-      );
-      res.cookie("access_token", `Bearer ${access_token}`, {
-        maxAge: access_token_cookie_expiration_time,
-        httpOnly: true,
-        secure: process.env.ENVIRONMENT === "production",
-      });
-     req.loggedInfo = payload;
-      next();
-    } else {
-      return res.status(401).json({status:401, message:"unauthorized access !"}); 
-    }
-  }
+
   if (access_token) {
-    console.log("refresh_token available & access_token available");
-    let verifyAccessToken = jwt.verify(
-      access_token,
-      process.env.ACCESS_TOKEN_SECRET
-    );
-    if (verifyAccessToken && typeof verifyAccessToken !== "string") {
-      req.loggedInfo = payload;
-      next();
-    } else {
-      return res.status(401).json({status:401, message:"unauthorized access !"});
+    let decoded;
+    try {
+      decoded = jwt.verify(access_token, process.env.ACCESS_TOKEN_SECRET);
+    } catch (err) {
+      throw new Error("Invalid access token");
     }
+
+    const user = await prisma.user.findUnique({ where: { email: decoded.email } });
+    if (!user) throw new Error("User not found");
+    req.loggedInfo = { id: user.id, email: user.email, role: user.role };
+    return next();
   }
+
+  if (refresh_token) {
+    let decoded;
+    try {
+      decoded = jwt.verify(refresh_token, process.env.REFRESH_TOKEN_SECRET);
+    } catch (err) {
+      throw new Error("Invalid refresh token");
+    }
+
+    const user = await prisma.user.findUnique({ where: { email: decoded.email } });
+    if (!user) throw new Error("User not found");
+
+    const newAccessToken = generateToken(
+      process.env.ACCESS_TOKEN_SECRET,
+      process.env.ACCESS_TOKEN_EXPIRATION_TIME,
+      { id: user.id, email: user.email }
+    );
+
+    res.cookie("access_token", `Bearer ${newAccessToken}`, {
+      maxAge: Number(process.env.ACCESS_TOKEN_COOKIE_EXPIRATION_TIME),
+      httpOnly: true,
+      secure: process.env.ENVIRONMENT === "production",
+    });
+
+    req.loggedInfo = { id: user.id, email: user.email, role: user.role };
+    return next();
+  }
+
+  res.status(401).json({ status: 401, message: "Please log in to access this service!" });
 });
 
 export { authenticateUser };

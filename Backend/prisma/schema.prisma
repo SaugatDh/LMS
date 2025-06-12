@@ -21,9 +21,20 @@ enum Role {
   TEACHER
 }
 
-// student model 
+enum CourseStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  DROPPED
+}
+
+enum CourseVisibility {
+  PUBLIC
+  PRIVATE
+}
 
 model User {
+<<<<<<< HEAD
   id String @id @default (uuid())
   firstName String
   lastName String
@@ -37,21 +48,70 @@ model User {
   role Role @default(USER)
   enrolledCourse Course[] @relation("student_relation") 
   createdCourse Course[] @relation("teacher_relation") 
+=======
+  id           String   @id @default(uuid())
+  firstName    String
+  lastName     String
+  email        String   @unique
+  class        Int?
+  password     String
+  profile      String?
+  refreshToken String   @unique
+  otp          String?
+  otpExpiresAt DateTime?
+  isVerified   Boolean  @default(false)
+  role         Role     @default(USER)
+
+  // Relations
+  enrolledCourses Enrollment[] // A user can enroll in many courses
+  createdCourses  Course[]     @relation("TeacherCourses") // A teacher can create many courses
+
+>>>>>>> upstream/main
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-//course model
-
 model Course {
-  id String @id @default (uuid())
-  name String
+  id          String @id @default(uuid())
+  title       String
   description String
+<<<<<<< HEAD
   credits Int
   student_id String?
   student User? @relation("student_relation",fields: [student_id], references: [id])
   teacher_id String?
   teacher User? @relation("teacher_relation",fields: [teacher_id], references: [id])
   createdAt DateTime @default(now())
+=======
+  duration    Int
+  thumbnail   String?
+  price       Float
+  teacherId   String
+
+  // Relations
+  teacher     User             @relation("TeacherCourses", fields: [teacherId], references: [id])
+  enrollments Enrollment[] // A course can have many enrolled students
+  visibility  CourseVisibility @default(PRIVATE)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model Enrollment {
+  id       String @id @default(uuid())
+  userId   String //student's user ID
+  courseId String
+
+  // Relations
+  user   User   @relation(fields: [userId], references: [id])
+  course Course @relation(fields: [courseId], references: [id])
+
+  // Additional Fields
+  enrolledAt DateTime     @default(now())
+  status     CourseStatus @default(NOT_STARTED)
+  progress   Float        @default(0.0) // Progress percentage
+
+>>>>>>> upstream/main
   updatedAt DateTime @updatedAt
+
+  @@unique([userId, courseId]) // Prevent duplicate enrollments
 }

@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import path,{ dirname } from 'path';
 import { fileURLToPath } from 'url';
 import ejs from "ejs";
+import { userFields } from "../../utils/schemaFields.js";
 
 import asyncHandler from "../../helpers/asyncHandler.js";
 import ErrorConfig from "../../helpers/errorConfig.js";
@@ -13,6 +14,7 @@ import uploadImageIntoCloudinary from "../../services/coudinary.js";
 import sendEmail from "../../services/gmail.js";
 import hashedData from "../../utils/generateHash.js";
 import prisma from "../../lib/dbConnection.js";
+import compareArray from "../../utils/compareArray.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -28,13 +30,15 @@ const test = asyncHandler(async (req, res, next) => {
 });
 
 const userRegistration = asyncHandler(async (req, res, next) => {
+ const isValid=compareArray(userFields, Object.keys(req.body));
+  if(!isValid) return next(new ErrorConfig(400,"Invalid fields"));
   let userData = req.body;
   console.log({userData});
   let userDataValues = Object.values(userData);
   let uploadProfile;
   let inserData;
   let profileImage = req.file;
-  //deleter role for security purpose
+  //delete role for security purpose
   delete userData?.role;
   if (profileImage) {
     uploadProfile = await uploadImageIntoCloudinary(profileImage?.path, "authentication/profile");
@@ -73,7 +77,7 @@ const userRegistration = asyncHandler(async (req, res, next) => {
     inserData = await prisma.user.create({
       data:{
       ...userData,
-      profile: uploadProfile?.url || undefined,
+      profile: uploadProfile?.url || null,
        refreshToken:refresh_token,
       otp: hashedOTP,
       otpExpiresAt
@@ -127,7 +131,8 @@ const login = asyncHandler(async (req, res, next) => {
   }
   let { email, password } = userData;
   let verifyEmail = await prisma.user.findUnique({ where: { email } });
-  if (verifyEmail?.is_verified === false) return next(new ErrorConfig(400, "please verify your account"));
+  console.log({verifyEmail})
+  if (verifyEmail?.isVerified === false) return next(new ErrorConfig(400, "please verify your account"));
   if (!verifyEmail) return next(new ErrorConfig(400, "Email or password doesn't match !!"));
   if (verifyEmail) {
     let verifyPassword = await bcrypt.compare(password, verifyEmail.password);

@@ -35,7 +35,7 @@ const AvailableCoursesSection = ({ availableCourses }) => {
             description={course.description}
             img={
               course.img ||
-              `https://source.unsplash.com/400x200/?learning,${encodeURIComponent(
+              `https://placehold.co/400x200?text=learning,${encodeURIComponent(
                 course.title
               )}`
             }

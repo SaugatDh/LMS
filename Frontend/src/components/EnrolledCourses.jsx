@@ -12,7 +12,7 @@ const EnrolledCourses = ({ studentName, courses }) => (
           title={course.title}
           nextLesson={course.nextLesson}
           progress={course.progress}
-          img={course.img || `https://source.unsplash.com/400x200/?education,course,${encodeURIComponent(course.title)}`}
+          img={course.img || `https://placehold.co/400x200?text=education,course,${encodeURIComponent(course.title)}`}
           button="Continue"
           cardClassName="border-blue-200 hover:border-blue-400 hover:shadow-blue-200"
           buttonClassName="bg-blue-600 hover:bg-blue-700"

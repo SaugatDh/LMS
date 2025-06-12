@@ -11,18 +11,18 @@ const courses = [
 ];
 
 const availableCourses = [
-	{ id: 101, title: "Advanced JavaScript", description: "Deep dive into JS concepts and best practices.", category: "Programming", img: "https://source.unsplash.com/400x200/?javascript,code" },
-	{ id: 102, title: "Data Structures in Python", description: "Learn about lists, trees, graphs, and more.", category: "Programming", img: "https://source.unsplash.com/400x200/?python,data-structures" },
-	{ id: 103, title: "UI/UX Design Basics", description: "Principles of user interface and experience design.", category: "Design", img: "https://source.unsplash.com/400x200/?ui,ux,design" },
-	{ id: 104, title: "Machine Learning 101", description: "Introduction to ML concepts and algorithms.", category: "AI & ML", img: "https://source.unsplash.com/400x200/?machine-learning,ai" },
-	{ id: 105, title: "Web Development Bootcamp", description: "HTML, CSS, JS, and modern frameworks.", category: "Programming", img: "https://source.unsplash.com/400x200/?web-development,html,css" },
-	{ id: 106, title: "Digital Marketing Essentials", description: "SEO, SEM, and social media marketing.", category: "Marketing", img: "https://source.unsplash.com/400x200/?marketing,digital" },
-	{ id: 107, title: "Cloud Computing Basics", description: "AWS, Azure, and cloud fundamentals.", category: "Cloud", img: "https://source.unsplash.com/400x200/?cloud,aws,azure" },
-	{ id: 108, title: "Cybersecurity Fundamentals", description: "Protect systems and data from threats.", category: "Security", img: "https://source.unsplash.com/400x200/?cybersecurity,security" },
-	{ id: 109, title: "Project Management", description: "Agile, Scrum, and project planning.", category: "Business", img: "https://source.unsplash.com/400x200/?project-management,agile" },
-	{ id: 110, title: "Photography Masterclass", description: "Camera basics, lighting, and editing.", category: "Creative", img: "https://source.unsplash.com/400x200/?photography,camera" },
-	{ id: 111, title: "Financial Literacy", description: "Personal finance, investing, and budgeting.", category: "Finance", img: "https://source.unsplash.com/400x200/?finance,money" },
-	{ id: 112, title: "Mobile App Development", description: "Build apps for Android and iOS.", category: "Programming", img: "https://source.unsplash.com/400x200/?mobile,app-development" },
+	{ id: 101, title: "Advanced JavaScript", description: "Deep dive into JS concepts and best practices.", category: "Programming", img: "https://placehold.co/400x200?text=javascript,code" },
+	{ id: 102, title: "Data Structures in Python", description: "Learn about lists, trees, graphs, and more.", category: "Programming", img: "https://placehold.co/400x200?text=python,data-structures" },
+	{ id: 103, title: "UI/UX Design Basics", description: "Principles of user interface and experience design.", category: "Design", img: "https://placehold.co/400x200?text=ui,ux,design" },
+	{ id: 104, title: "Machine Learning 101", description: "Introduction to ML concepts and algorithms.", category: "AI & ML", img: "https://placehold.co/400x200?text=machine-learning,ai" },
+	{ id: 105, title: "Web Development Bootcamp", description: "HTML, CSS, JS, and modern frameworks.", category: "Programming", img: "https://placehold.co/400x200?text=web-development,html,css" },
+	{ id: 106, title: "Digital Marketing Essentials", description: "SEO, SEM, and social media marketing.", category: "Marketing", img: "https://placehold.co/400x200?text=marketing,digital" },
+	{ id: 107, title: "Cloud Computing Basics", description: "AWS, Azure, and cloud fundamentals.", category: "Cloud", img: "https://placehold.co/400x200?text=cloud,aws,azure" },
+	{ id: 108, title: "Cybersecurity Fundamentals", description: "Protect systems and data from threats.", category: "Security", img: "https://placehold.co/400x200?text=cybersecurity,security" },
+	{ id: 109, title: "Project Management", description: "Agile, Scrum, and project planning.", category: "Business", img: "https://placehold.co/400x200?text=project-management,agile" },
+	{ id: 110, title: "Photography Masterclass", description: "Camera basics, lighting, and editing.", category: "Creative", img: "https://placehold.co/400x200?text=photography,camera" },
+	{ id: 111, title: "Financial Literacy", description: "Personal finance, investing, and budgeting.", category: "Finance", img: "https://placehold.co/400x200?text=finance,money" },
+	{ id: 112, title: "Mobile App Development", description: "Build apps for Android and iOS.", category: "Programming", img: "https://placehold.co/400x200?text=mobile,app-development" },
 ];
 
 const Home = ({ user }) => {

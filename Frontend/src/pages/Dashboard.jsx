@@ -8,9 +8,9 @@ const Dashboard= ({ user }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const enrolledCourses = [
-    { id: 1, title: "React for Beginners", progress: 100, nextLesson: "Course Complete", img: "https://source.unsplash.com/400x200/?react,web" },
-    { id: 2, title: "Intro to Python", progress: 80, nextLesson: "Functions and Loops", img: "https://source.unsplash.com/400x200/?python,code" },
-    { id: 3, title: "Machine Learning 101", progress: 60, nextLesson: "Supervised Learning", img: "https://source.unsplash.com/400x200/?machine-learning,ai" },
+    { id: 1, title: "React for Beginners", progress: 100, nextLesson: "Course Complete", img: "https://placehold.co/400x200?text=react,web" },
+    { id: 2, title: "Intro to Python", progress: 80, nextLesson: "Functions and Loops", img: "https://placehold.co/400x200?text=python,code" },
+    { id: 3, title: "Machine Learning 101", progress: 60, nextLesson: "Supervised Learning", img: "https://placehold.co/400x200?text=machine-learning,ai" },
   ];
 
   return (

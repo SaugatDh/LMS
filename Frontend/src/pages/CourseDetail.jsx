@@ -7,7 +7,7 @@ import Footer from "../components/Footer";
 const CourseDetail = ({ user }) => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const { courseId } = useParams();
-  
+
   // This would typically come from an API/database
   const getCourseDetails = (id) => {
     const courses = {
@@ -31,22 +31,33 @@ const CourseDetail = ({ user }) => {
     <div>
       <Header onMenuClick={() => setSidebarOpen(true)} user={user} />
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-transparent z-30"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
       <div className="pt-20 pl-0 md:pl-0 min-h-screen bg-gray-100">
         <div className="max-w-4xl mx-auto py-10 px-4">
-          <h1 className="text-3xl font-bold mb-6">{course?.title}</h1>
-          <p className="text-gray-600 mb-8">{course?.description}</p>
-          
-          <div className="bg-white rounded-xl shadow p-6">
-            <h2 className="text-xl font-semibold mb-4">Course Content</h2>
-            <div className="space-y-4">
-              {course?.modules.map((module, index) => (
-                <div key={index} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-                  <span className="font-medium">{module.title}</span>
-                  <span className="text-gray-500 text-sm">{module.duration}</span>
+          {course ? (
+            <>
+              <h1 className="text-3xl font-bold mt-7 mb-6">{course.title}</h1>
+              <p className="text-gray-600 mb-8">{course.description}</p>
+              <div className="bg-white rounded-xl shadow p-6">
+                <h2 className="text-xl font-semibold mb-4">Course Content</h2>
+                <div className="space-y-4">
+                  {course.modules.map((module, index) => (
+                    <div key={index} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                      <span className="font-medium">{module.title}</span>
+                      <span className="text-gray-500 text-sm">{module.duration}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
+            </>
+          ) : (
+            <div className="text-center text-gray-500 py-20">Course not found.</div>
+          )}
         </div>
       </div>
       <Footer />

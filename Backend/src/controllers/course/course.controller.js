@@ -2,6 +2,8 @@ import asyncHandler from "../../helpers/asyncHandler.js";
 import ResponseConfig from "../../helpers/responseConfig.js";
 import ErrorConfig from "../../helpers/errorConfig.js";
 import prisma from "../../lib/dbConnection.js";
+import excludeFields from "../../utils/excludeFields.js";
+import { userFields } from "../../utils/schemaFields.js";
 
 //Enroll a user in a course
 const enrollInCourse=asyncHandler(async (req,res,next)=>{
@@ -31,7 +33,16 @@ const enrollInCourse=asyncHandler(async (req,res,next)=>{
 //Fetch all courses
 
 const fetchAllCourses=asyncHandler(async (req,res,next)=>{
-    const courses=await prisma.course.findMany({});
+    // Exclude sensitive fields from the teacher's profile
+    const selectTeacherFields = excludeFields(userFields, ["class","password", "refreshToken", "otp", "otpExpiresAt"]);
+    const courses=await prisma.course.findMany({
+        include:{
+            teacher:{
+                select:selectTeacherFields
+            },
+            enrollments:true
+        }
+    });
     if(courses.length===0) return next(new ErrorConfig(404,"No courses found !"));
     return res.status(200).json(new ResponseConfig(200,"All courses fetched successfully",courses));
 });

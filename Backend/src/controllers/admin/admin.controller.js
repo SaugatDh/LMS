@@ -13,7 +13,9 @@ const updateRole = asyncHandler(async (req, res, next) => {
     where: { id: user_id },
     data: {
       role,
-      isVerified: req.body?.isVerified || false, // Assuming you want to set isVerified to true when updating role
+      otp:null,
+      otpExpiresAt: null,
+      isVerified: req.body?.isVerified || false,
     },
   });
   if (updateUserRole)

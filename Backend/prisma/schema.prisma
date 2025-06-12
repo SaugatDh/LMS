@@ -42,8 +42,8 @@ model User {
   password     String
   profile      String?
   refreshToken String   @unique
-  otp          String
-  otpExpiresAt DateTime
+  otp          String?
+  otpExpiresAt DateTime?
   isVerified   Boolean  @default(false)
   role         Role     @default(USER)
 
@@ -59,7 +59,9 @@ model Course {
   id          String @id @default(uuid())
   title       String
   description String
-  credits     Int
+  duration    Int
+  thumbnail   String?
+  price       Float
   teacherId   String
 
   // Relations
@@ -72,7 +74,7 @@ model Course {
 
 model Enrollment {
   id       String @id @default(uuid())
-  userId   String
+  userId   String //student's user ID
   courseId String
 
   // Relations

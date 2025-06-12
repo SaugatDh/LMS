@@ -3,27 +3,29 @@ import ResponseConfig from "../../helpers/responseConfig.js";
 import ErrorConfig from "../../helpers/errorConfig.js";
 import prisma from "../../lib/dbConnection.js";
 import excludeFields from "../../utils/excludeFields.js";
-import { userFields } from "../../utils/schemaFields.js";
+import { userFields,courseField } from "../../utils/schemaFields.js";
+import compareArray from "../../utils/compareArray.js";
 
 //Enroll a user in a course
 const enrollInCourse=asyncHandler(async (req,res,next)=>{
-    const {courseId}=req.params;
+    const {courseId,userId}=req.body;
     const {id}=req.loggedInfo; // loggedInfo contains the id of the user
+    console.log({courseId,id});
     // Check if the course exists
     const course=await prisma.course.findUnique({where:{id:courseId}});
     if(!course) return next(new ErrorConfig(404,"Course not found !"));
     // Check if the user is already enrolled in the course
-    const existingEnrollment=await prisma.enrollment.findUnique({
-        where:{
-                userId:id,
-                courseId:courseId
+    const existingEnrollment=await prisma.enrollment.create({
+        data:{
+                userId,
+                courseId
         }
     });
     if(existingEnrollment) return next(new ErrorConfig(409,"User is already enrolled in this course !"));
     const enrollment=await prisma.enrollment.create({
         data:{
-            userId:id,
-            courseId:courseId
+            userId,
+            courseId
         }
     });
     if(enrollment) return res.status(201).json(new ResponseConfig(201,"Enrolled in course successfully",enrollment));
@@ -33,14 +35,20 @@ const enrollInCourse=asyncHandler(async (req,res,next)=>{
 //Fetch all courses
 
 const fetchAllCourses=asyncHandler(async (req,res,next)=>{
-    // Exclude sensitive fields from the teacher's profile
-    const selectTeacherFields = excludeFields(userFields, ["class","password", "refreshToken", "otp", "otpExpiresAt"]);
+    // Exclude sensitive fields from the teacher's profile or student's profile
+    const selectUserFields = excludeFields(userFields, ["class","password", "refreshToken", "otp", "otpExpiresAt"]);
     const courses=await prisma.course.findMany({
         include:{
             teacher:{
-                select:selectTeacherFields
+                select:selectUserFields
             },
-            enrollments:true
+            enrollments:{
+                include:{
+                    user:{
+                        select:selectUserFields
+                    }
+                }
+            }
         }
     });
     if(courses.length===0) return next(new ErrorConfig(404,"No courses found !"));
@@ -68,6 +76,8 @@ const fetchEnrolledCourses=asyncHandler(async (req,res,next)=>{
 
 //create courses
 const createCourse=asyncHandler(async (req,res,next)=>{
+    const isValidCourseData=compareArray(courseField,Object.keys(req.body));
+    if(!isValidCourseData) return next(new ErrorConfig(400,"Invalid course data !"));
     const courseData=req.body;
     console.log({courseData});
     if(Object.values(courseData).some(data=>(data===" " || data===undefined || data===null))){

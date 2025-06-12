@@ -15,5 +15,16 @@ const userFields = [
   "updatedAt",
 ];
 
+const courseField=[
+    "title",
+    "description",
+    "thumbnail",
+    "price",
+    "duration",
+    "teacherId",
+    "visibility",
+    "createdAt",
+    "updatedAt"
+]
 
-export { userFields };
+export { userFields, courseField };

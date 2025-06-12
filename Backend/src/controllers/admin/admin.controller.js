@@ -3,7 +3,7 @@ import ResponseConfig from "../../helpers/responseConfig.js";
 import ErrorConfig from "../../helpers/errorConfig.js";
 import prisma from "../../lib/dbConnection.js";
 
-// update user role 
+// update user role or depending upon condition admin may update others fields as well
 const updateRole = asyncHandler(async (req, res, next) => {
   const { user_id } = req.params;
   const { role } = req.body;

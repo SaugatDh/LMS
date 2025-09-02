@@ -57,3 +57,9 @@ LMS/
     │   └── store/
     └── package.json
 ```
+
+## Screenshots
+
+![Screenshot 1](Screenshot from 2025-09-02 19-34-07.png)
+![Screenshot 2](Screenshot from 2025-09-02 19-34-12.png)
+![Screenshot 3](Screenshot from 2025-09-02 19-34-33.png)

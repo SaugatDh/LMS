@@ -60,6 +60,11 @@ LMS/
 
 ## Screenshots
 
-![Screenshot 1](Screenshot from 2025-09-02 19-34-07.png)
-![Screenshot 2](Screenshot from 2025-09-02 19-34-12.png)
-![Screenshot 3](Screenshot from 2025-09-02 19-34-33.png)
+### Login Screen
+![Login Screen](screenshots/login-screen.png)
+
+### Student Dashboard
+![Student Dashboard](screenshots/dashboard.png)
+
+### Course View
+![Course View](screenshots/course-view.png)
